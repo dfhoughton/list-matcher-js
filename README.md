@@ -254,8 +254,8 @@ therefore includes polyfills that supply these if they are absent. All polyfills
 
 There are regular expression features used in finding and defining unicode word boundaries. These are
 not present in all javascript engines either, and they cannot be polyfilled.
-- (look behinds)[https://caniuse.com/js-regexp-lookbehind]
-- (property escapes)[https://caniuse.com/mdn-javascript_builtins_regexp_property_escapes]
+- [look behinds](https://caniuse.com/js-regexp-lookbehind)
+- [property escapes](https://caniuse.com/mdn-javascript_builtins_regexp_property_escapes)
 
 If you either avoid unicode, avoid the `bound` option, or avoid the browers that have not implemented these
 features, you will be okay.
