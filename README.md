@@ -152,7 +152,7 @@ The order of flags in the flag string is irrelevant. Characters other than those
 `i` causes all phrases to be downcased.
 
 `u` changes the definition of word boundaries. Instead of matching on the margin between `\w` and `\W` or the ends of the string,
-unicode word boundary expression match on the margin between any word or number character of `_` and the ends of the string.
+unicode word boundary expression match on the margin between any word or number character or `_` and the ends of the string.
 In order to do this the pattern must use a lookbehind, which may not be implemented in every javascript engine. If you don't set
 the `bound` option, this is irrelevant.
 
