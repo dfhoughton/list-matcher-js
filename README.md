@@ -250,7 +250,7 @@ higher number codepoints. In particular, I have not tested the matching of combi
 `list-matcher` relies heavily on `String.prototype.fromCharCode` and `String.prototype.codePointAt` and
 other functions in the `String` prototype. Not all of these are implemented in all browsers. `list-matcher`
 therefore includes polyfills that supply these if they are absent. All polyfills are borrowed from
-(the Mozilla Developer Network)[https://developer.mozilla.org].
+[the Mozilla Developer Network](https://developer.mozilla.org).
 
 There are regular expression features used in finding and defining unicode word boundaries. These are
 not present in all javascript engines either, and they cannot be polyfilled.
