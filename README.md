@@ -181,7 +181,7 @@ let clauses = regex(['V S O', 'S V O', 'S O V'], { normalizeWhitespace: true, su
 // => /(?:\b(?:Anne|Bob|Carol)\b\s+(?:\b(?:c(?:hunk|lam)|rock)s\b\s+\b(?:eat|pat|throw)s\b|\b(?:eat|pat|throw)s\b\s+\b(?:c(?:hunk|lam)|rock)s\b)|\b(?:eat|pat|throw)s\b\s+\b(?:Anne|Bob|Carol)\b\s+\b(?:c(?:hunk|lam)|rock)s\b)/
 ```
 
-This example makes apparent the regretable lack of the `(?i:...)` expression in javascript regular expressions. We must have case insensitivity for
+This example makes salient the regretable lack of the `(?i:...)` expression in javascript regular expressions. We must have case insensitivity for
 the whole expression or none of it, alas.
 
 *Note*, word boundary discovery cannot occur if the potential word boundary in question is a substitution. See `bound` above.
