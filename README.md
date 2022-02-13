@@ -31,7 +31,7 @@ regex(qw('0123456789', ''))
 
 // it can express character classes as ranges
 regex(qw('abcdefghijklmnopqrstuvwxyz_0123456789', ''))
-// => /[0-9_a-z]/
+// => /[\d_a-z]/
 
 // let's make this case-insensitive!
 regex(qw('abcdefghijklmnopqrstuvwxyz_0123456789', ''), { flags: 'i' })

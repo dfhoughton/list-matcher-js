@@ -28,7 +28,7 @@ describe('README', () => {
     test('it finds simple character classes!', () => expect(regex(qw('0123456789', ''))).toEqual(/\d/))
 
     test('it can express character classes as ranges', () =>
-      expect(regex(qw('abcdefghijklmnopqrstuvwxyz_0123456789', ''))).toEqual(/[0-9_a-z]/))
+      expect(regex(qw('abcdefghijklmnopqrstuvwxyz_0123456789', ''))).toEqual(/[\d_a-z]/))
 
     test("let's make this case-insensitive!", () =>
       expect(regex(qw('abcdefghijklmnopqrstuvwxyz_0123456789', ''), { flags: 'i' })).toEqual(/\w/i))

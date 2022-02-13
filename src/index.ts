@@ -436,16 +436,13 @@ function safeCharClass(codePoints: number[], opts: Opts): string {
   }
   // condense a few of the more common character classes
   // we might extend this list in the future
-  switch (chars) {
-    case '0-9':
-      return '\\d'
-    case '0-9_a-z':
-      if (opts.caseInsensitive) return '\\w'
-      break
-    case '0-9A-Z_a-z':
-      return '\\w'
+  if (opts.caseInsensitive) {
+    chars = chars.replace(/0-9(.*)_(.*)a-z/, '\\w$1$2')
+  } else {
+    chars = chars.replace(/0-9(.*)A-Z(.*)_(.*)a-z/, '\\w$1$2$3')
   }
-  return `[${chars}]`
+  chars = chars.replace('0-9', '\\d')
+  return /^\\\w$/.test(chars) ? chars : `[${chars}]`
 }
 
 // convert a code point back into a fragment of a regular expression
