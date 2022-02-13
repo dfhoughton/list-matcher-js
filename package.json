@@ -1,9 +1,9 @@
 {
   "name": "list-matcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Make non-backtracking regular expressions from arrays of strings.",
-  "main": ".lib/index.js",
-  "types": ".lib/index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
     "build": "tsc"
