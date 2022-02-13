@@ -117,9 +117,11 @@ regex(['süß', 'bloß'], { bound: true })
 // => /(?<![\p{L}\p{N}_])(?:blo|sü)ß(?![\p{L}\p{N}_])/u
 ```
 
+*Note*, word boundary discovery is suspended for substituted patterns. See below.
+
 #### `capture`: `boolean`
 
-`regex` should generated expression in parentheses.
+`regex` should generate expression in parentheses.
 
 ```ts
 regex(qw('cat cats'), { capture: true })
@@ -181,6 +183,8 @@ let clauses = regex(['V S O', 'S V O', 'S O V'], { normalizeWhitespace: true, su
 
 This example makes apparent the regretable lack of the `(?i:...)` expression in javascript regular expressions. We must have case insensitivity for
 the whole expression or none of it, alas.
+
+*Note*, word boundary discovery cannot occur if the potential word boundary in question is a substitution. See `bound` above.
 
 ### `qw`
 

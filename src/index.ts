@@ -6,12 +6,12 @@
  * @remarks
  * The chief export of this library is {@link regex}. In addition there is the function
  * {@link qw}, which makes it slightly easier to make lists of phrases to give to {@link regex}.
- * 
+ *
  * This library also provides polyfills for various String.prototype functions for javascript engines
  * that don't yet implement them. These are `String.prototype.repeat`, `String.prototype.includes`,
  * `String.prototype.codePointAt`, and `String.prototype.fromCodePoint`. All polyfills were borrowed from
  * {@link https://developer.mozilla.org|MDN}.
- * 
+ *
  * Some regular expression features, in particular {@link https://caniuse.com/js-regexp-lookbehind|lookbehinds}, and
  * {@link https://caniuse.com/mdn-javascript_builtins_regexp_property_escapes|property escapes}, are used to
  * discover word boundaries in strings with code points above the ASCII range. These cannot be polyfilled,
@@ -41,7 +41,7 @@ export type ListMatcherOptions = {
  * ```ts
  * regex(qw('cat camel coulomb dog e f g h i'))
  * => /(?:c(?:a(?:mel|t)|oulomb)|dog|[e-i])/
- * 
+ *
  * // telephone numbers
  * regex(['+## #### ######b', 'b###-####b', '(###) ###-####b'],{substitutions: {'b': '\\b', '#': '\\d'}})
  * => /(?:\(\d{3}\) \d{3}-|\+\d\d \d{4} \d\d|\b\d{3}-)\d{4}\b/
@@ -136,7 +136,7 @@ function adjustOptions(words: string[], opts: ListMatcherOptions): Opts {
     let w = doSubstitutions(words[i])
     if (seen.has(w)) continue
     seen.add(w)
-    if (w.length === 0) continue // TODO document handling of empty strings
+    if (w.length === 0) continue
     if (!options.unicode) {
       for (let j = 0; j < w.length; j++) {
         const c = w.codePointAt(j)
@@ -174,7 +174,7 @@ function adjustOptions(words: string[], opts: ListMatcherOptions): Opts {
 }
 
 function condense(slices: Slice[], opts: Opts): string {
-  if (slices.length === 0) return '(?!)' // TODO document this
+  if (slices.length === 0) return '(?!)'
   const [slcs1, prefix] = extractPrefix(slices, opts)
   // if this was everything, just return the prefix
   if (slcs1.length === 1 && sliceLength(slcs1[0]) === 0) return prefix
@@ -488,7 +488,6 @@ function quotemeta(codePoint: number, inCharClass: boolean): string {
 /**
  * Patch IE to provide String.prototype.repeat, String.prototype.includes, String.codePointAt, and String.fromCodePoint
  */
-// TODO document this
 
 /*! https://mths.be/codepointat v0.2.0 by @mathias */
 // @ts-ignore
@@ -620,41 +619,35 @@ if (!String.prototype.includes) {
 
 /*! https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat */
 if (!String.prototype.repeat) {
-  String.prototype.repeat = function(count) {
-    'use strict';
-    if (this == null)
-      throw new TypeError('can\'t convert ' + this + ' to object');
+  String.prototype.repeat = function (count) {
+    'use strict'
+    if (this == null) throw new TypeError("can't convert " + this + ' to object')
 
-    var str = '' + this;
+    var str = '' + this
     // To convert string to integer.
-    count = +count;
+    count = +count
     // Check NaN
-    if (count != count)
-      count = 0;
+    if (count != count) count = 0
 
-    if (count < 0)
-      throw new RangeError('repeat count must be non-negative');
+    if (count < 0) throw new RangeError('repeat count must be non-negative')
 
-    if (count == Infinity)
-      throw new RangeError('repeat count must be less than infinity');
+    if (count == Infinity) throw new RangeError('repeat count must be less than infinity')
 
-    count = Math.floor(count);
-    if (str.length == 0 || count == 0)
-      return '';
+    count = Math.floor(count)
+    if (str.length == 0 || count == 0) return ''
 
     // Ensuring count is a 31-bit integer allows us to heavily optimize the
     // main part. But anyway, most current (August 2014) browsers can't handle
     // strings 1 << 28 chars or longer, so:
-    if (str.length * count >= 1 << 28)
-      throw new RangeError('repeat count must not overflow maximum string size');
+    if (str.length * count >= 1 << 28) throw new RangeError('repeat count must not overflow maximum string size')
 
-    var maxCount = str.length * count;
-    count = Math.floor(Math.log(count) / Math.log(2));
+    var maxCount = str.length * count
+    count = Math.floor(Math.log(count) / Math.log(2))
     while (count) {
-       str += str;
-       count--;
+      str += str
+      count--
     }
-    str += str.substring(0, maxCount - str.length);
-    return str;
+    str += str.substring(0, maxCount - str.length)
+    return str
   }
 }
