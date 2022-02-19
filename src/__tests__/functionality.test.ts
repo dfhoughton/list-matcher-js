@@ -42,7 +42,12 @@ describe('regex', () => {
       },
       { words: ['fooooo'], pattern: 'fo{5}' },
       { words: ['cat foo'], pattern: 'cat\\s+foo', options: { normalizeWhitespace: true } },
-      { label: 'whitespace escapes', words: qw(' \r\t\n', ''), pattern: '[\\t\\n\\r ]' },
+      { label: 'whitespace escapes', words: qw(' \v\r\t\n\f', ''), pattern: '[\\t-\\r ]' },
+      { label: 'whitespace escapes: vertical', words: qw(' \v', ''), pattern: '[\\v ]' },
+      { label: 'whitespace escapes: carriage return', words: qw(' \r', ''), pattern: '[\\r ]' },
+      { label: 'whitespace escapes: tab', words: qw(' \t', ''), pattern: '[\\t ]' },
+      { label: 'whitespace escapes: newline', words: qw(' \n', ''), pattern: '[\\n ]' },
+      { label: 'whitespace escapes: form feed', words: qw(' \f', ''), pattern: '[\\f ]' },
       { label: 'empty pattern', words: [], pattern: '(?!)' },
       {
         words: qw('cat cats'),

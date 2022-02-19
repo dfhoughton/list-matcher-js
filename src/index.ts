@@ -473,12 +473,21 @@ function toAtom(codePoint: number, inCharClass: boolean, options?: Opts): string
 // escape regular expression meta-characters as necessary given the context
 // character classes have different meta-characters
 function quotemeta(codePoint: number, inCharClass: boolean): string {
-  if (codePoint === 9) return '\\t'
-  if (codePoint === 10) return '\\n'
-  if (codePoint === 12) return '\\f'
-  if (codePoint === 13) return '\\r'
-  const escape = (inCharClass ? CHAR_CLASS_META : META).includes(codePoint)
+  if (codePoint < 14) {
+    if (codePoint > 8) {
+      if (codePoint === 9) return '\\t'
+      if (codePoint === 10) return '\\n'
+      if (codePoint === 11) return '\\v'
+      if (codePoint === 12) return '\\f'
+      if (codePoint === 13) return '\\r'
+    } else if (codePoint === 0) {
+      return '\\0'
+    }
+    return String.fromCodePoint(codePoint)
+  }
   const c = String.fromCodePoint(codePoint)
+  if (codePoint > 124) return c
+  const escape = (inCharClass ? CHAR_CLASS_META : META).includes(codePoint)
   return escape ? '\\' + c : c
 }
 
