@@ -1,6 +1,6 @@
 {
   "name": "list-matcher",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Make non-backtracking regular expressions from arrays of strings.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
