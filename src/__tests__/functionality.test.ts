@@ -162,6 +162,14 @@ describe('regex', () => {
         duds: ['0123-4567', '123-45670', '(802) 123-45670', '802-123-45670'],
         substitutions: { '#': '\\d', b: '\\b' },
       },
+      {
+        label: 'null character and soh as substitution',
+        words: ['\x01\0\0\0-\0\0\0\0\x01', '(\0\0\0) \0\0\0-\0\0\0\0\x01', '\x01\0\0\0-\0\0\0-\0\0\0\0\x01'],
+        pattern: '(?:\\(\\d{3}\\) |\\b\\d{3}-|\\b)\\d{3}-\\d{4}\\b',
+        testWords: ['123-4567', '(802) 123-4567', '802-123-4567'],
+        duds: ['0123-4567', '123-45670', '(802) 123-45670', '802-123-45670'],
+        substitutions: { '\0': '\\d', '\x01': '\\b' },
+      },
     ]
 
     substitutionTests.forEach(({ words, pattern, duds, label, options, suffix, testWords, substitutions }) => {
@@ -179,6 +187,99 @@ describe('regex', () => {
           test(`${label}: ${w} !~ ${rx}`.slice(0, 64), () => expect(rx.test(w)).toBeFalsy())
         }
       }
+    })
+  })
+
+  describe('unicode and surrogate pairs', () => {
+    test('emoji (surrogate pairs) are handled correctly', () => {
+      const rx = regex(['😀', '😁', '😂'])
+      expect(rx.test('😀')).toBe(true)
+      expect(rx.test('😁')).toBe(true)
+      expect(rx.test('😂')).toBe(true)
+      expect(rx.test('🤔')).toBe(false)
+      expect(rx.flags).toContain('u')
+    })
+
+    test('supplementary plane characters (Deseret) are handled correctly', () => {
+      const rx = regex(['𐐷', '𐐸', '𐐹'])
+      expect(rx.test('𐐷')).toBe(true)
+      expect(rx.test('𐐸')).toBe(true)
+      expect(rx.test('𐐹')).toBe(true)
+      expect(rx.test('𐐺')).toBe(false)
+      expect(rx.flags).toContain('u')
+    })
+
+    test('mixed ASCII and emoji', () => {
+      const rx = regex(['cat', '😀', 'dog'])
+      expect(rx.test('cat')).toBe(true)
+      expect(rx.test('😀')).toBe(true)
+      expect(rx.test('dog')).toBe(true)
+      expect(rx.test('bird')).toBe(false)
+      expect(rx.flags).toContain('u')
+    })
+
+    test('unicode flag is set for non-ASCII substitution values', () => {
+      const rx = regex(['#'], { substitutions: { '#': '€' } })
+      expect(rx.source).toContain('€')
+      expect(rx.test('€')).toBe(true)
+      expect(rx.flags).toContain('u')
+    })
+
+    test('unicode flag is set for non-ASCII in substitution values (complex)', () => {
+      const rx = regex(['##'], { substitutions: { '#': '€' } })
+      expect(rx.test('€€')).toBe(true)
+      expect(rx.flags).toContain('u')
+    })
+
+    test('non-ASCII characters in words trigger unicode flag', () => {
+      const rx = regex(['café'])
+      expect(rx.test('café')).toBe(true)
+      expect(rx.flags).toContain('u')
+    })
+
+    test('control characters are escaped as hex', () => {
+      const soh = String.fromCharCode(1)
+      const bel = String.fromCharCode(7)
+      const rx = regex([soh, bel])
+      expect(rx.source).toContain('\\x01')
+      expect(rx.source).toContain('\\x07')
+      expect(rx.test(soh)).toBe(true)
+      expect(rx.test(bel)).toBe(true)
+    })
+
+    test('all control characters (0-31) are handled correctly', () => {
+      const controlChars = []
+      for (let i = 0; i <= 31; i++) {
+        controlChars.push(String.fromCharCode(i))
+      }
+      const rx = regex(controlChars)
+      for (let i = 0; i <= 31; i++) {
+        expect(rx.test(String.fromCharCode(i))).toBe(true)
+      }
+      // Control characters may be represented as a range or individually
+      // The important thing is that they all match correctly
+      expect(rx.source.length > 0).toBe(true)
+    })
+
+    test('zero-width characters are handled', () => {
+      const zwsp = '\u200b' // zero-width space
+      const zwj = '\u200d' // zero-width joiner
+      const zwnj = '\u200c' // zero-width non-joiner
+      const rx = regex([zwsp, zwj, zwnj])
+      expect(rx.test(zwsp)).toBe(true)
+      expect(rx.test(zwj)).toBe(true)
+      expect(rx.test(zwnj)).toBe(true)
+      expect(rx.flags).toContain('u')
+    })
+
+    test('combined unicode characters (NFC vs NFD)', () => {
+      // é can be U+00E9 (single) or U+0065 + U+0301 (e + combining acute)
+      const single = '\u00e9'
+      const combined = 'e\u0301'
+      const rx = regex([single, combined])
+      expect(rx.test(single)).toBe(true)
+      expect(rx.test(combined)).toBe(true)
+      expect(rx.flags).toContain('u')
     })
   })
 })

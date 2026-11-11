@@ -75,7 +75,7 @@ type Opts = {
   bound: boolean
   capture: boolean
   normalizeWhitespace: boolean
-  subtitutions?: Record<number, string>
+  substitutions?: Record<number, string>
   global: boolean
   caseInsensitive: boolean
   unicode: boolean
@@ -129,7 +129,7 @@ function adjustOptions(words: string[], opts: ListMatcherOptions): Opts {
     sticky: flags.includes('y'),
   }
   const doSubstitutions = prepareSubstitutions(opts, options, words)
-  const ignore = options.subtitutions ? Object.keys(options.subtitutions).map((s) => Number(s)) : []
+  const ignore = options.substitutions ? Object.keys(options.substitutions).map((s) => Number(s)) : []
   const seen = new Set()
   const newWords: string[] = []
   for (let i = 0; i < words.length; i++) {
@@ -144,6 +144,20 @@ function adjustOptions(words: string[], opts: ListMatcherOptions): Opts {
         if (c === undefined || c > 127) {
           options.unicode = true
           break
+        }
+      }
+      // Also check substitution values for non-ASCII characters
+      if (!options.unicode && opts.substitutions) {
+        for (const [, to] of Object.entries(opts.substitutions)) {
+          for (let j = 0; j < to.length; j++) {
+            const c = to.codePointAt(j)
+            if (c === undefined) continue
+            if (c > 127) {
+              options.unicode = true
+              break
+            }
+          }
+          if (options.unicode) break
         }
       }
     }
@@ -315,7 +329,7 @@ function prepareSubstitutions(opts: ListMatcherOptions, options: Opts, words: st
       replacementHash[from] = char
       substitutions[cp] = to
     }
-    options.subtitutions = substitutions
+    options.substitutions = substitutions
     const rx = regex(Object.keys(opts.substitutions), { flags: 'g' })
     return (w) => w.replace(rx, (s) => replacementHash[s]!)
   } else {
@@ -349,13 +363,18 @@ function getUnusedCharacters(count: number, words: string[]): [number, string][]
 // adds boundaries
 // fixes substitution map so its keys are negative
 function toSlices(words: string[], options: Opts): Slice[] {
-  const substitutionCodepoints = Object.keys(options.subtitutions || {}).map((n) => Number(n))
+  const substitutionCodepoints = Object.keys(options.substitutions || {}).map((n) => Number(n))
   const slices = words.map((w) => {
-    // to accelerate other code, we store subtitution codepoints as negative numbers
-    let codePoints = w
-      .split('')
-      .map((c) => c.codePointAt(0) || 0)
-      .map((c) => (substitutionCodepoints.includes(c) ? -c : c))
+    // to accelerate other code, we store substitution codepoints as negative numbers
+    // Use a proper code point iterator to handle surrogate pairs correctly
+    let codePoints: number[] = []
+    for (let i = 0; i < w.length; i++) {
+      const cp = w.codePointAt(i)
+      if (cp === undefined) continue
+      codePoints.push(substitutionCodepoints.includes(cp) ? -cp : cp)
+      // Skip the next code unit if this was a surrogate pair
+      if (cp > 0xffff) i++
+    }
     if (options.normalizeWhitespace) codePoints = codePoints.map((c) => (c === 32 ? SPECIAL_CODE_POINTS.whiteSpace : c))
     if (options.bound) {
       if (options.unicode) {
@@ -369,10 +388,10 @@ function toSlices(words: string[], options: Opts): Slice[] {
     }
     return { codePoints, start: 0, end: codePoints.length }
   })
-  if (options.subtitutions) {
-    Object.entries(options.subtitutions).forEach(([k, v]) => {
-      options.subtitutions![-Number(k)] = v
-      delete options.subtitutions![Number(k)]
+  if (options.substitutions) {
+    Object.entries(options.substitutions).forEach(([k, v]) => {
+      options.substitutions![-Number(k)] = v
+      delete options.substitutions![Number(k)]
     })
   }
   return slices
@@ -462,8 +481,8 @@ function toAtom(codePoint: number, inCharClass: boolean, options?: Opts): string
         throw new Error(`unexpected code point: ${codePoint}`)
     }
   } else {
-    if (options?.subtitutions) {
-      const rx = options.subtitutions[codePoint]
+    if (options?.substitutions) {
+      const rx = options.substitutions[codePoint]
       if (rx !== undefined) return rx
     }
     return quotemeta(codePoint, inCharClass)
@@ -483,7 +502,8 @@ function quotemeta(codePoint: number, inCharClass: boolean): string {
     } else if (codePoint === 0) {
       return '\\0'
     }
-    return String.fromCodePoint(codePoint)
+    // Control characters 1-8: use hex escape for readability
+    return `\\x${codePoint.toString(16).padStart(2, '0')}`
   }
   const c = String.fromCodePoint(codePoint)
   if (codePoint > 124) return c

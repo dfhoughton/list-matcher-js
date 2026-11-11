@@ -248,8 +248,9 @@ expressions, you should avoid doing this in a tight loop.
 
 ## Caveats
 
-Though I have taken some care to handle non-ASCII characters, I have not yet thoroughly tested
-higher number codepoints. In particular, I have not tested the matching of combined unicode characters.
+Though I have taken some care to handle non-ASCII characters, including higher number codepoints
+such as emoji and supplementary plane characters. In particular, I have not tested the matching of
+combined unicode characters.
 
 `list-matcher` relies heavily on `String.prototype.fromCharCode` and `String.prototype.codePointAt` and
 other functions in the `String` prototype. Not all of these are implemented in all browsers. `list-matcher`
@@ -264,7 +265,7 @@ not present in all javascript engines either, and they cannot be polyfilled.
 If you either avoid unicode, avoid the `bound` option, or avoid the browers that have not implemented these
 features, you will be okay.
 
-If you use `substitutions`, you are responsible for the patterns subsituted in; `list-matcher` won't check
+If you use `substitutions`, you are responsible for the patterns substituted in; `list-matcher` won't check
 them.
 
 ## Acknowledgements
