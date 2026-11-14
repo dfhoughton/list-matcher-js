@@ -19,7 +19,7 @@
 	"homepage": "https://github.com/dfhoughton/list-matcher-js",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/dfhoughton/list-matcher-js"
+		"url": "git+https://github.com/dfhoughton/list-matcher-js.git"
 	},
 	"keywords": [
 		"match",
