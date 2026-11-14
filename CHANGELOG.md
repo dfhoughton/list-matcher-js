@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.0.4
+## v1.0.4 *2026-11-14*
 - fix surrogate pair handling: now correctly handles emoji and other supplementary plane characters (code points > 65535)
 - fix unicode flag detection: automatically set for non-ASCII substitution values
 - fix control character escaping: use hex escapes (\x01, \x07, etc.) instead of raw characters for code points 1-8
